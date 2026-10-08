@@ -70,7 +70,17 @@ const PROJECTS = [
     summary:"Live MTA data, reviewed by MTA engineers",
     description:"A Python dashboard that pulls live NYC MTA data to visualize risk metrics by bus route and neighborhood. MTA engineers formally reviewed it for potential implementation and system optimization insights.",
     role:"Solo project.",
-    tech:["Python","MTA real-time data","Data visualization"], links:[{label:"Code (Team repo)", href:"https://github.com/MaksimPikovskiy/mhc-datathon-2025"}] }
+    tech:["Python","MTA real-time data","Data visualization"], links:[{label:"Code (Team repo)", href:"https://github.com/MaksimPikovskiy/mhc-datathon-2025"}] },
+    { name:"MediLens", cat:"software",
+    summary:"Scan a pill label, get a plain-English explanation",
+    description:"An AI assistant that reads photos of prescriptions and medication labels and explains them in simple, accessible language. PaddleOCR extracts the text, a LangGraph agent running Gemini pulls official drug data from the openFDA API, and the result is an explanation of uses, side effects, and warnings that users can ask follow-up questions about. The FastAPI backend is fully working; the React front end is built but not yet wired to it.",
+    role:"One of five contributors on a team project.",
+    tech:["FastAPI","PaddleOCR","LangGraph","Gemini","openFDA API","React","Python"],
+    links:[
+      {label:"Demo video", href:"https://www.youtube.com/watch?v=FdIM_Mcb0-c"},
+      {label:"Slides", href:"https://docs.google.com/presentation/d/1X2lw622FaYvy8Tf3WkwZFYEo4yLmUnS3eP1DG-mRt24/edit?usp=sharing"},
+      {label:"Code (team repo)", href:"https://github.com/DianaAleksieieva/MediLens"}
+    ] },
 ];
 
 const EXPERIENCE = [
