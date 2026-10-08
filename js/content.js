@@ -70,7 +70,7 @@ const PROJECTS = [
     summary:"Live MTA data, reviewed by MTA engineers",
     description:"A Python dashboard that pulls live NYC MTA data to visualize risk metrics by bus route and neighborhood. MTA engineers formally reviewed it for potential implementation and system optimization insights.",
     role:"Solo project.",
-    tech:["Python","MTA real-time data","Data visualization"], links:[] }
+    tech:["Python","MTA real-time data","Data visualization"], links:[{label:"Code (Team repo)", href:"https://github.com/MaksimPikovskiy/mhc-datathon-2025"}] }
 ];
 
 const EXPERIENCE = [
