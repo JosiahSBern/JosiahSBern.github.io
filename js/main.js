@@ -48,7 +48,7 @@ const contactItems = [
   ["Email", PROFILE.email, "mailto:"+PROFILE.email],
   ["GitHub", PROFILE.github.replace(/^https?:\/\//,""), PROFILE.github],
   ["LinkedIn", PROFILE.linkedin.replace(/^https?:\/\/(www\.)?/,""), PROFILE.linkedin],
-  PROFILE.resume ? ["Resume", "PDF, one page", PROFILE.resume] : ["Resume", "Request a copy by email", "mailto:"+PROFILE.email+"?subject=Resume%20request"]
+  PROFILE.resume ? ["Resume", "PDF", PROFILE.resume] : ["Resume", "Request a copy by email", "mailto:"+PROFILE.email+"?subject=Resume%20request"]
 ];
 $("#controls").innerHTML = contactItems.map(([k,v,h])=>`<a class="ctl" href="${esc(h)}"${h.startsWith("http")?' target="_blank" rel="noopener"':""}><span class="btn" aria-hidden="true"></span><span><b>${k}</b><small>${esc(v)}</small></span></a>`).join("");
 
