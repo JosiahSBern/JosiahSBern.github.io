@@ -1,0 +1,1042 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Josiah Bernard | Robotics, Embedded Systems &amp; Software Developer</title>
+<meta name="description" content="Portfolio of Josiah Bernard, ECE student at NYU Tandon working on robotics, robot learning, and embedded systems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --floor:#0c0a11; --panel:rgba(22,17,32,.9); --panel-solid:#17121f; --raised:#211a2e;
+  --line:#251d34; --steel:#3b3152; --text:#eeeaf6; --muted:#a79dbd;
+  --accent:#a56bff; --accent-hi:#b98aff; --accent-ink:#13091f; --glow:#d49bff;
+  --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --rail-h:88px; --head-h:68px; --tab-origin:-9px 50%;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+/* Dark by design; restated so a forced theme can't wash it out. */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--floor:#0c0a11;--text:#eeeaf6}}
+:root[data-theme="dark"]{--floor:#0c0a11;--text:#eeeaf6}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{
+  background:var(--floor);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px;background-position:-1px -1px;
+  color:var(--text);font-family:var(--font);font-size:17px;line-height:1.55;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--text)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--glow);outline-offset:3px;border-radius:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;left:16px;top:-60px;z-index:50;background:var(--accent);color:var(--accent-ink);padding:10px 14px;font-weight:700;border-radius:4px;text-decoration:none}
+.skip:focus{top:calc(env(safe-area-inset-top,0px) + 12px)}
+
+#stage{position:fixed;inset:0;z-index:0}
+#stage canvas{display:block;width:100%;height:100%}
+.no-3d #stage{display:none}
+
+/* Header */
+.top{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:var(--head-h);z-index:10;display:flex;align-items:center;justify-content:space-between;padding:0 28px;pointer-events:none}
+.top > *{pointer-events:auto}
+.brand{display:flex;align-items:baseline;gap:12px;text-decoration:none}
+.brand b{font-stretch:118%;font-weight:800;font-size:19px;letter-spacing:-.01em}
+.brand span{color:var(--muted);font-size:14px}
+.toggles{display:flex;gap:8px}
+.toggle{background:rgba(23,18,31,.85);border:1px solid var(--steel);border-radius:999px;padding:7px 14px 7px 12px;font-size:13.5px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.toggle::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--steel);transition:background .2s}
+.toggle[aria-pressed="true"]::before{background:var(--accent);box-shadow:0 0 8px rgba(165,107,255,.8)}
+.toggle:hover{border-color:var(--muted)}
+
+/* Rail navigation */
+.railnav{position:fixed;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:var(--rail-h);z-index:10;background:linear-gradient(to top,var(--floor) 55%,rgba(12,10,17,0));padding:0 28px}
+.rail{list-style:none;margin:0 auto;padding:22px 0 0;max-width:1080px;display:flex;justify-content:space-between;position:relative}
+.rail::before{content:"";position:absolute;left:28px;right:28px;top:32px;height:2px;background:repeating-linear-gradient(90deg,var(--steel) 0 10px,transparent 10px 14px)}
+.rail li{position:relative;flex:1;display:flex;justify-content:center}
+.stop{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;padding:2px 6px 8px;color:var(--muted);font-size:14px;font-stretch:96%}
+.stop i{width:14px;height:14px;border:2px solid var(--steel);background:var(--floor);transform:rotate(45deg);transition:border-color .2s,background .2s}
+.stop:hover{color:var(--text)}
+.stop:hover i{border-color:var(--muted)}
+.stop[aria-current="true"]{color:var(--text);font-weight:600}
+.stop[aria-current="true"] i{border-color:var(--accent);background:var(--accent)}
+.carriage{position:absolute;top:24px;left:0;width:34px;height:18px;margin-left:-17px;border:2px solid var(--accent);border-radius:3px;pointer-events:none;box-shadow:0 0 14px rgba(165,107,255,.45);transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.robot-on .carriage{transition:none}
+
+/* Telemetry */
+.telemetry{position:fixed;left:28px;bottom:calc(var(--rail-h) + 10px + env(safe-area-inset-bottom,0px));z-index:5;font-stretch:72%;font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted);display:grid;grid-template-columns:repeat(5,auto);gap:2px 18px;pointer-events:none}
+.telemetry b{color:var(--text);font-weight:500}
+.telemetry .wide{grid-column:span 5;display:flex;gap:18px}
+.status{position:fixed;left:28px;bottom:calc(var(--rail-h) + 62px + env(safe-area-inset-bottom,0px));z-index:5;margin:0;font-size:15px;font-weight:600;font-stretch:90%;display:flex;align-items:center;gap:10px;pointer-events:none}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--glow);box-shadow:0 0 10px var(--glow)}
+.no-3d .telemetry,.no-3d .status{display:none}
+
+/* Laser pointer */
+.laser{position:fixed;inset:0;width:100%;height:100%;z-index:7;pointer-events:none;opacity:0;transition:opacity .25s}
+.laser.on{opacity:1}
+.laser line{stroke:var(--glow);stroke-width:1.5;stroke-dasharray:7 6;animation:flow .6s linear infinite;filter:drop-shadow(0 0 4px rgba(212,155,255,.9))}
+.laser circle{fill:var(--glow);filter:drop-shadow(0 0 6px var(--glow))}
+@keyframes flow{to{stroke-dashoffset:-13}}
+
+/* Pages: physical plates the arm grabs by their tab */
+.panels{position:fixed;z-index:4;top:calc(var(--head-h) + env(safe-area-inset-top,0px));bottom:calc(var(--rail-h) + 8px + env(safe-area-inset-bottom,0px));left:52%;right:28px}
+.no-3d .panels{left:max(20px,calc(50% - 420px));right:max(20px,calc(50% - 420px))}
+.station{position:absolute;inset:0;background:var(--panel);border:1px solid var(--line);border-radius:6px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.7);transform-origin:var(--tab-origin);
+  opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s}
+.station.is-active,.station.in-transit{opacity:1;visibility:visible;transition:opacity .35s ease,visibility 0s}
+.station.held{transition:none}
+.station.settling{transition:transform .45s cubic-bezier(.3,1.35,.5,1)}
+.station.dropping{opacity:0;transition:transform .8s cubic-bezier(.55,0,.9,.5),opacity .4s ease .4s}
+.motion-off .station{transition:none}
+.scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:40px 44px 56px;border-radius:inherit}
+.scroll > *{max-width:640px}
+.grab-tab{position:absolute;left:-19px;top:50%;margin-top:-34px;width:19px;height:68px;border-radius:5px 0 0 5px;background:linear-gradient(90deg,#4a3c68,#2a2140);border:1px solid #5d4b84;border-right:0;transition:box-shadow .2s}
+.grab-tab::before{content:"";position:absolute;top:14px;bottom:14px;left:6px;right:5px;background:repeating-linear-gradient(0deg,#9a83c6 0 2px,transparent 2px 6px);opacity:.75}
+.held .grab-tab,.in-transit .grab-tab{box-shadow:0 0 14px rgba(185,138,255,.7)}
+.no-3d .grab-tab{display:none}
+.station-home .scroll{display:flex;flex-direction:column;justify-content:center}
+
+h1,h2,h3{margin:0;font-weight:700}
+h2:focus,h1:focus{outline:none}
+.hero-name{font-size:clamp(52px,6.6vw,118px);font-stretch:125%;font-weight:850;line-height:.88;letter-spacing:-.035em;margin-bottom:18px}
+.hero-role{font-size:clamp(20px,1.9vw,26px);font-stretch:112%;font-weight:500;margin:0 0 20px}
+.hero-copy{font-size:18px;color:var(--muted);margin:0 0 32px;max-width:34em}
+.cta{display:inline-flex;align-items:center;gap:14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:4px;padding:16px 22px;font-weight:700;font-size:17px;cursor:pointer;font-stretch:105%;align-self:flex-start}
+.cta:hover{background:var(--accent-hi)}
+.cta svg{flex:none}
+.hint{margin:16px 0 0;color:var(--muted);font-size:14.5px}
+kbd{font-family:inherit;font-size:13px;border:1px solid var(--steel);border-bottom-width:2px;border-radius:3px;padding:0 5px}
+
+h2{font-size:clamp(36px,3.6vw,50px);font-stretch:120%;font-weight:780;line-height:1;letter-spacing:-.02em;margin-bottom:14px}
+.lede{color:var(--muted);font-size:18px;margin:0 0 30px}
+.scroll p{margin:0 0 1em}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:10px 24px;margin:30px 0 0;padding:22px 0 0;border-top:1px solid var(--line)}
+.facts dt{color:var(--muted);font-size:14.5px;padding-top:2px}
+.facts dd{margin:0}
+.next{margin-top:40px;background:none;border:1px solid var(--steel);border-radius:4px;padding:12px 18px;cursor:pointer;font-weight:600}
+.next:hover{border-color:var(--accent)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.filter{background:none;border:1px solid var(--steel);border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer;color:var(--muted)}
+.filter[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:rgba(165,107,255,.14)}
+.fixtures{display:flex;flex-direction:column;gap:10px}
+.fixture{border:1px solid var(--line);border-left:4px solid var(--steel);border-radius:4px;background:var(--panel-solid);transition:border-color .2s}
+.fixture.open{border-left-color:var(--accent);border-color:var(--steel)}
+.fixture-title{font-size:inherit}
+.fixture-btn{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 16px;width:100%;padding:16px 18px}
+.fixture-btn:focus-visible{outline:2px solid var(--glow);outline-offset:-2px}
+.fx-name{font-size:20px;font-stretch:108%;font-weight:700}
+.fx-cat{grid-row:1;grid-column:2;font-size:13px;color:var(--muted);align-self:center}
+.fx-sum{grid-column:1 / -1;color:var(--muted);font-size:15.5px}
+.fixture-body{padding:0 18px 20px}
+.spec{display:grid;gap:14px;margin:16px 0}
+.spec dt{color:var(--muted);font-size:14px;margin-bottom:4px}
+.spec dd{margin:0}
+.tags{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.tags li{font-size:13.5px;padding:3px 9px;border:1px solid var(--steel);border-radius:3px;background:var(--floor)}
+.media{margin:4px 0 16px}
+.media img,.media video{width:100%;border-radius:4px;border:1px solid var(--line);display:block}
+.links{display:flex;gap:16px;flex-wrap:wrap}
+.links a{font-weight:600;text-underline-offset:4px;text-decoration-color:var(--accent)}
+
+.timeline{list-style:none;margin:0;padding:0 0 0 26px;position:relative}
+.timeline::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--steel)}
+.tl{position:relative;margin-bottom:8px}
+.tl::before{content:"";position:absolute;left:-26px;top:21px;width:12px;height:12px;background:var(--floor);border:2px solid var(--steel);transform:rotate(45deg)}
+.tl.open::before,.tl.now::before{border-color:var(--accent)}
+.tl.open::before{background:var(--accent)}
+.tl-btn{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:0 16px;width:100%;padding:12px 14px;border-radius:4px}
+.tl-btn:hover{background:var(--raised)}
+.tl-btn:focus-visible{outline:2px solid var(--glow)}
+.tl-org{font-weight:700;font-size:18px;font-stretch:106%}
+.tl-when{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums;align-self:center}
+.tl-role{grid-column:1 / -1;color:var(--muted);font-size:15.5px}
+.tl-body{padding:4px 14px 14px;font-size:16px}
+.tl-body p{margin:0}
+
+.bins{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.bin{all:unset;box-sizing:border-box;cursor:pointer;display:block;border:1px solid var(--line);background:var(--panel-solid);border-radius:4px;padding:16px 16px 12px;transition:border-color .2s}
+.bin:hover{border-color:var(--steel)}
+.bin:focus-visible{outline:2px solid var(--glow)}
+.bin[aria-pressed="true"]{border-color:var(--accent)}
+.bin-name{display:block;font-weight:700;font-stretch:108%;font-size:17px;margin-bottom:8px}
+.ic{display:inline-block;position:relative;margin:9px 5px 9px 0;padding:5px 11px;font-size:13.5px;background:#0a080e;border:1px solid var(--steel);border-radius:2px}
+.ic::before,.ic::after{content:"";position:absolute;left:5px;right:5px;height:4px;background:repeating-linear-gradient(90deg,#8a809c 0 3px,transparent 3px 7px)}
+.ic::before{top:-5px}.ic::after{bottom:-5px}
+.bin[aria-pressed="true"] .ic{border-color:#6a4fa0}
+
+.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:8px}
+.ctl{display:flex;align-items:center;gap:16px;padding:18px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(#211a2e,#17121f);text-decoration:none;transition:border-color .2s}
+.ctl:hover{border-color:var(--accent)}
+.ctl .btn{flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#d2b4ff,var(--accent) 55%,#5e33a8);box-shadow:0 0 0 5px #2a2238,0 0 0 6px #43385a,0 3px 6px rgba(0,0,0,.6)}
+.ctl:active .btn{transform:translateY(1px)}
+.ctl b{display:block;font-size:17px}
+.ctl small{display:block;color:var(--muted);font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctl > span:last-child{min-width:0}
+
+@media (max-width:820px){
+  :root{--rail-h:74px;--head-h:56px;--tab-origin:50% -8px}
+  body{font-size:16px}
+  .top{padding:0 16px}
+  .brand span{display:none}
+  .toggle{padding:6px 11px;font-size:12.5px}
+  .panels{left:0;right:0;top:44vh;top:44svh}
+  .no-3d .panels{top:calc(var(--head-h) + 8px)}
+  .station{border-radius:10px 10px 0 0;border-left:0;border-right:0}
+  .scroll{padding:26px 20px 40px}
+  .grab-tab{left:50%;top:-17px;margin:0 0 0 -36px;width:72px;height:17px;border-radius:5px 5px 0 0;border:1px solid #5d4b84;border-bottom:0;background:linear-gradient(#4a3c68,#2a2140)}
+  .grab-tab::before{top:5px;bottom:4px;left:14px;right:14px;background:repeating-linear-gradient(90deg,#9a83c6 0 2px,transparent 2px 6px)}
+  .hero-copy{font-size:16.5px;margin-bottom:24px}
+  .telemetry{display:none}
+  .status{left:16px;bottom:auto;top:calc(44svh - 46px);font-size:13px}
+  .railnav{padding:0 4px}
+  .rail{padding-top:16px}
+  .rail::before{top:26px;left:20px;right:20px}
+  .carriage{top:18px}
+  .stop{font-size:12px;padding:2px 2px 6px}
+  .controls{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.laser line{animation:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#panels">Skip to content</a>
+<div id="stage" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="#home" data-goto="0"><b>Josiah Bernard</b><span>Robotics, Embedded Systems &amp; Software Developer</span></a>
+  <div class="toggles">
+    <button class="toggle" id="travelToggle" type="button" aria-pressed="true">Robot travel</button>
+    <button class="toggle" id="soundToggle" type="button" aria-pressed="false">Sound</button>
+  </div>
+</header>
+
+<p class="status" id="status" aria-hidden="true">Now at Home</p>
+<div class="telemetry" aria-hidden="true">
+  <span>J1 <b id="j0">0.0°</b></span><span>J2 <b id="j1">0.0°</b></span><span>J3 <b id="j2">0.0°</b></span><span>J4 <b id="j3">0.0°</b></span><span>J5 <b id="j4">0.0°</b></span>
+  <span class="wide"><span>Rail <b id="railPos">0.00 m</b></span><span>Gripper <b id="gripState">Closed</b></span></span>
+</div>
+<div class="sr-only" aria-live="polite" id="announce"></div>
+<svg class="laser" id="laser" aria-hidden="true"><line id="laserLine" x1="0" y1="0" x2="0" y2="0"/><circle id="laserDot" r="4" cx="0" cy="0"/></svg>
+
+<main class="panels" id="panels">
+  <section class="station station-home" id="home" aria-labelledby="h-home"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h1 class="hero-name" id="h-home" tabindex="-1">Josiah<br>Bernard</h1>
+    <p class="hero-role">Robotics, Embedded Systems &amp; Software Developer</p>
+    <p class="hero-copy">I build robots end to end: the circuits, the control code, and the software that decides what they do next. My work ranges from a solar-powered irrigation system running outdoors on Governors Island to ROS 2 navigation on NVIDIA Jetson and manipulation trained in Isaac Lab and MuJoCo. I study Electrical and Computer Engineering at NYU Tandon.</p>
+    <button class="cta" type="button" data-goto="1">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h16M7 20v-4l4-6 5 2M11 10l-1-5h4"/><circle cx="16" cy="12" r="1.6" fill="currentColor"/></svg>
+      Let the robot show you around
+    </button>
+    <p class="hint">The robot grabs this page and swaps in the next one. You can also pick a stop on the rail below or use <kbd>←</kbd> <kbd>→</kbd>.</p>
+  </div></section>
+
+  <section class="station" id="about" aria-labelledby="h-about"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-about" tabindex="-1">About</h2>
+    <p class="lede">I like the moment code leaves the screen and something physical moves.</p>
+    <p>I'm an Electrical and Computer Engineering student at NYU Tandon, and I work across the whole stack of a robot: wiring and motor drivers, embedded control, navigation, perception, and the learning systems on top.</p>
+    <p>Recently that's meant leading hardware for an off-grid irrigation system now deployed as a paying customer pilot, building navigation for NYU's combat robotics team, and training manipulation tasks in NVIDIA Isaac Lab and MuJoCo. At CUNY I built a robot tutor that adapts to autistic children's emotions and presented it at the BARS Symposium.</p>
+    <p>I started in computer science at BMCC, graduating with honors, and spent a year as a CUNY Tech Prep fellow mentored by Amazon engineers. The thread through all of it: I want the things I build to work outside the lab.</p>
+    <dl class="facts">
+      <dt>Based in</dt><dd>Brooklyn, NY</dd>
+      <dt>Studying</dt><dd>B.S. Electrical &amp; Computer Engineering, NYU Tandon, expected May 2028</dd>
+      <dt>Focus</dt><dd>Robot navigation and manipulation, embedded control, GPU computing</dd>
+      <dt>Looking for</dt><dd>Summer 2027 internships in robotics</dd>
+    </dl>
+    <button class="next" type="button" data-goto="2">Next stop: Projects</button>
+  </div></section>
+
+  <section class="station" id="projects" aria-labelledby="h-projects"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-projects" tabindex="-1">Projects</h2>
+    <p class="lede">Things I've built, from field-deployed hardware to simulation. Open one and the arm will point you to it.</p>
+    <div class="filters" role="group" aria-label="Filter projects" id="filters"></div>
+    <div class="fixtures" id="projectList"></div>
+    <button class="next" type="button" data-goto="3">Next stop: Experience</button>
+  </div></section>
+
+  <section class="station" id="experience" aria-labelledby="h-experience"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-experience" tabindex="-1">Experience</h2>
+    <p class="lede">Teams, research, and school, most recent first.</p>
+    <ol class="timeline" id="timeline"></ol>
+    <button class="next" type="button" data-goto="4">Next stop: Skills</button>
+  </div></section>
+
+  <section class="station" id="skills" aria-labelledby="h-skills"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-skills" tabindex="-1">Skills</h2>
+    <p class="lede">The parts bins I reach into most. Select a bin to have the robot pick it out.</p>
+    <div class="bins" id="bins"></div>
+    <button class="next" type="button" data-goto="5">Next stop: Contact</button>
+  </div></section>
+
+  <section class="station" id="contact" aria-labelledby="h-contact"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-contact" tabindex="-1">Contact</h2>
+    <p class="lede">End of the line. I'm looking for summer 2027 internships in robotics and embedded systems, and I'm always happy to talk about a build.</p>
+    <div class="controls" id="controls"></div>
+    <button class="next" type="button" data-goto="0">Back to the start</button>
+  </div></section>
+</main>
+
+<nav class="railnav" aria-label="Sections">
+  <ol class="rail" id="rail"></ol>
+</nav>
+
+<script>
+(() => {
+/* ============ Content: edit everything here ============ */
+const PROFILE = {
+  name: "Josiah Bernard",
+  role: "Robotics, Embedded Systems & Software Developer",
+  email: "josiahrbernard@gmail.com",
+  github: "https://github.com/JosiahSBern",
+  linkedin: "https://www.linkedin.com/in/josiah-st-bernard",
+  resume: "resume.pdf"   // the PDF sitting next to index.html in the repo
+};
+
+const CATS = { robotics:"Robotics", robomaster:"Competition robotics", embedded:"Embedded", gpu:"GPU & ML", software:"Software" };
+
+// links: [{label:"Code", href:"https://github.com/..."}, {label:"Demo", href:"..."}]
+// media: {type:"img"|"video", src:"...", alt:"..."}
+const PROJECTS = [
+  { name:"Off-grid smart irrigation system", cat:"embedded",
+    summary:"Solar-powered irrigation, deployed on Governors Island",
+    description:"A solar-powered, off-grid irrigation controller taken from first prototype to a field-ready deployment. A Raspberry Pi 4 drives solenoid valves through relay control logic, and a Flask web server lets growers monitor and run watering remotely. Delivered as a $20K customer pilot on Governors Island, where it validated performance in a real outdoor environment.",
+    role:"Led the end-to-end hardware development as an engineering intern at Plantaer.",
+    tech:["Raspberry Pi 4","Python","Flask","Relay control","Solenoid valves","Solar power"], links:[] },
+  { name:"Emotionally intelligent robot tutor", cat:"robotics",
+    summary:"Adaptive human-robot interaction for autistic children",
+    description:"A ROS-based tutoring robot that combines speech, vision, and gesture recognition with SLAM so it can move around a room and adapt how it teaches to a child's emotional state. I presented the research at the BARS Symposium to an audience of more than 100 researchers and faculty.",
+    role:"Robotics research assistant at CUNY: perception integration, interaction flow, and navigation.",
+    tech:["ROS","SLAM","Speech recognition","Computer vision","Gesture recognition","Python"], links:[] },
+  { name:"NYU ARC controls", cat:"robomaster",
+    summary:"ROS 2 navigation for a competition robotics team",
+    description:"Controls work for NYU's combat robotics team, building navigation on ROS 2, Nav2, and SLAM running on an NVIDIA Jetson to get the robots ready for the ARCC and RoboMaster North America competitions. I keep a weekly engineering notebook of design iterations, test results, and next steps.",
+    role:"Controls subteam member.",
+    tech:["ROS 2","Nav2","SLAM","NVIDIA Jetson","C++","Python"], links:[] },
+  { name:"RUKA", cat:"robotics",
+    summary:"Dexterous hand that catches thrown objects",
+    description:"A catching system for the RUKA dexterous hand mounted on a UR5e. I built the combined hand-and-arm scene in MuJoCo (22 DOF, 21 actuators) and designed a predictive catch: a Kalman filter estimates the object's trajectory so the hand is already moving to the intercept point before the object arrives.",
+    role:"Simulation scene, state estimation, and a budget hardware plan built on Dynamixel XL330 servos.",
+    tech:["MuJoCo","Python","Kalman filter","UR5e","Dynamixel XL330"], links:[] },
+  { name:"BLOC", cat:"robotics",
+    summary:"LEGO assembly with a UR5 arm in Isaac Lab",
+    description:"A robot that assembles LEGO structures, trained and tested in NVIDIA Isaac Lab as part of Project STEP through Purdue's Vertically Integrated Projects program.",
+    role:"Environment setup, task design, and training runs.",
+    tech:["Isaac Lab","Isaac Sim","UR5","PyTorch","Reinforcement learning"], links:[] },
+  { name:"Warehouse robot simulation", cat:"robotics",
+    summary:"Autonomous fleet navigation with an AI dispatcher",
+    description:"A ROS 2 warehouse system in which robots map and navigate autonomously with SLAM and Nav2, while an AI-based dispatcher assigns tasks across the fleet and keeps robots from colliding.",
+    role:"Solo project.",
+    tech:["ROS 2","Nav2","SLAM","Python"], links:[] },
+  { name:"NeuroPBR", cat:"gpu",
+    summary:"End-to-end PBR material reconstruction",
+    description:"A system that reconstructs physically based rendering (PBR) materials end to end, running a Core ML model on device with custom Metal shaders for rendering. Built during the CUNY Tech Prep fellowship and presented at LinkedIn HQ.",
+    role:"Data Science Fellow, CUNY Tech Prep.",
+    tech:["PyTorch","Core ML","Metal","Swift"], links:[] },
+  { name:"CUDA kernels for robot learning", cat:"gpu",
+    summary:"Softmax, tiled matmul, and a GPU rollout buffer",
+    description:"CUDA kernels written from scratch: a single-kernel softmax using parallel reduction, packaged as a shared library; matrix multiply with shared-memory tiling; and, in progress, a parallel trajectory rollout buffer that computes generalized advantage estimation (GAE) on the GPU.",
+    role:"Solo project.",
+    tech:["CUDA","C++","nvcc","PyTorch"], links:[] },
+  { name:"Quiztronics RAG tutor", cat:"software",
+    summary:"Retrieval-augmented C++ tutoring, 50%+ more accurate",
+    description:"A retrieval-augmented generation pipeline for a C++ tutoring assistant, built with LangChain, a JSON vector store, and MySQL. Grounding answers in course material improved response accuracy by more than 50%.",
+    role:"AI/software intern at Quiztronics (RFCUNY).",
+    tech:["Python","LangChain","MySQL","Vector search","LLMs"], links:[] },
+  { name:"Bus route risk dashboard", cat:"software",
+    summary:"Live MTA data, reviewed by MTA engineers",
+    description:"A Python dashboard that pulls live NYC MTA data to visualize risk metrics by bus route and neighborhood. MTA engineers formally reviewed it for potential implementation and system optimization insights.",
+    role:"Solo project.",
+    tech:["Python","MTA real-time data","Data visualization"], links:[] }
+];
+
+const EXPERIENCE = [
+  { org:"NYU ARC Robotics", role:"Controls subteam member", when:"Sep 2026 – now", now:true,
+    body:"ROS 2, Nav2, and SLAM on NVIDIA Jetson for NYU's combat robotics team, supporting readiness for the ARCC and RoboMaster North America competitions. I keep the team's weekly VIP engineering notebook." },
+  { org:"Project STEP, Purdue VIP", role:"Humanoid robotics research", when:"Current", now:true,
+    body:"Humanoid RL training and the BLOC LEGO-assembly task in NVIDIA Isaac Lab, through Purdue's Vertically Integrated Projects program." },
+  { org:"Plantaer", role:"Engineering intern", when:"Feb – Aug 2026",
+    body:"Led end-to-end hardware development of a solar-powered, off-grid smart irrigation system, delivered as a $20K customer pilot deployed on Governors Island." },
+  { org:"CUNY Tech Prep", role:"Data Science Fellow", when:"Jul 2025 – Jul 2026",
+    body:"Competitive fellowship mentored by Amazon engineers. Presented NeuroPBR, an end-to-end PBR material reconstruction system, at LinkedIn HQ." },
+  { org:"Quiztronics (RFCUNY)", role:"AI/software intern", when:"Jun – Sep 2025",
+    body:"Built a retrieval-augmented generation pipeline with LangChain, a JSON vector store, and MySQL that improved the accuracy of C++ tutoring responses by more than 50%." },
+  { org:"CUNY", role:"Robotics research assistant", when:"Dec 2024 – Jan 2026",
+    body:"Built a ROS-based, emotionally intelligent robot tutor for autistic children, combining speech, vision, gesture recognition, and SLAM. Presented the work at the BARS Symposium to 100+ researchers and faculty." },
+  { org:"NYU Tandon School of Engineering", role:"B.S. Electrical & Computer Engineering", when:"Exp. May 2028",
+    body:"Coursework: Robotic Manipulation & Locomotion, Signals & Systems, Linear Algebra & Differential Equations, Fundamentals of Electric Circuits." },
+  { org:"Borough of Manhattan Community College", role:"A.S. Computer Science, Honors", when:"2025",
+    body:"Coursework: Data Structures, Digital Logic & State Machine Design, Discrete Mathematics." }
+];
+
+const SKILLS = [
+  { name:"Languages", items:["C++","C","Python","Java","JavaScript","HTML/CSS"] },
+  { name:"Robotics & simulation", items:["ROS 2","Nav2","SLAM","Isaac Lab","Isaac Sim","MuJoCo"] },
+  { name:"Embedded & hardware", items:["Raspberry Pi","Arduino","NVIDIA Jetson","Motor drivers","PID control","Actuators","LiDAR"] },
+  { name:"ML & GPU", items:["PyTorch","CUDA","OpenCV","Reinforcement learning"] },
+  { name:"AI & backend", items:["LangChain","Ollama","Flask","SQL"] },
+  { name:"Tools", items:["Linux","Git"] }
+];
+
+const STATIONS = [
+  {id:"home",label:"Home"},{id:"about",label:"About"},{id:"projects",label:"Projects"},
+  {id:"experience",label:"Experience"},{id:"skills",label:"Skills"},{id:"contact",label:"Contact"}
+];
+
+/* ============ Rendering ============ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+$("#rail").innerHTML = STATIONS.map((s,i)=>`<li><button class="stop" type="button" data-goto="${i}"><i></i>${s.label}</button></li>`).join("") + `<span class="carriage" id="carriage"></span>`;
+
+$("#filters").innerHTML = [["all","All"],...Object.entries(CATS).filter(([k])=>PROJECTS.some(p=>p.cat===k))]
+  .map(([k,v],i)=>`<button class="filter" type="button" data-filter="${k}" aria-pressed="${i===0}">${v}</button>`).join("");
+
+$("#projectList").innerHTML = PROJECTS.map((p,i)=>`
+<article class="fixture" data-cat="${p.cat}">
+  <h3 class="fixture-title"><button type="button" class="fixture-btn" aria-expanded="false" aria-controls="pb-${i}">
+    <span class="fx-name">${esc(p.name)}</span><span class="fx-cat">${esc(CATS[p.cat])}</span><span class="fx-sum">${esc(p.summary)}</span>
+  </button></h3>
+  <div class="fixture-body" id="pb-${i}" hidden>
+    ${p.media ? `<figure class="media">${p.media.type==="video"
+      ? `<video src="${esc(p.media.src)}" controls preload="none" playsinline></video>`
+      : `<img src="${esc(p.media.src)}" alt="${esc(p.media.alt||"")}" loading="lazy">`}</figure>` : ""}
+    <p>${esc(p.description)}</p>
+    <dl class="spec">
+      <div><dt>My role</dt><dd>${esc(p.role)}</dd></div>
+      <div><dt>Built with</dt><dd><ul class="tags">${p.tech.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></dd></div>
+    </dl>
+    ${p.links && p.links.length ? `<p class="links">${p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</p>` : ""}
+  </div>
+</article>`).join("");
+
+$("#timeline").innerHTML = EXPERIENCE.map((e,i)=>`
+<li class="tl${e.now?" now":""}">
+  <button type="button" class="tl-btn" aria-expanded="false" aria-controls="tb-${i}">
+    <span class="tl-org">${esc(e.org)}</span><span class="tl-when">${esc(e.when)}</span><span class="tl-role">${esc(e.role)}</span>
+  </button>
+  <div class="tl-body" id="tb-${i}" hidden><p>${esc(e.body)}</p></div>
+</li>`).join("");
+
+$("#bins").innerHTML = SKILLS.map(b=>`<button type="button" class="bin" aria-pressed="false"><span class="bin-name">${esc(b.name)}</span>${b.items.map(s=>`<span class="ic">${esc(s)}</span>`).join("")}</button>`).join("");
+
+const contactItems = [
+  ["Email", PROFILE.email, "mailto:"+PROFILE.email],
+  ["GitHub", PROFILE.github.replace(/^https?:\/\//,""), PROFILE.github],
+  ["LinkedIn", PROFILE.linkedin.replace(/^https?:\/\/(www\.)?/,""), PROFILE.linkedin],
+  PROFILE.resume ? ["Resume", "PDF, one page", PROFILE.resume] : ["Resume", "Request a copy by email", "mailto:"+PROFILE.email+"?subject=Resume%20request"]
+];
+$("#controls").innerHTML = contactItems.map(([k,v,h])=>`<a class="ctl" href="${esc(h)}"${h.startsWith("http")?' target="_blank" rel="noopener"':""}><span class="btn" aria-hidden="true"></span><span><b>${k}</b><small>${esc(v)}</small></span></a>`).join("");
+
+/* ============ Navigation state ============ */
+const sections = STATIONS.map(s => document.getElementById(s.id));
+const stops = $$(".stop");
+const statusEl = $("#status"), announceEl = $("#announce");
+const rm = matchMedia("(prefers-reduced-motion: reduce)");
+let travelOn = !rm.matches;
+let robot = null;
+let current = indexFromHash();
+let busy = false, queued = null;
+window.__timeScale = 1;
+
+function indexFromHash(){ const i = STATIONS.findIndex(s => "#"+s.id === location.hash); return i < 0 ? 0 : i; }
+function setStatus(t){ statusEl.textContent = t; }
+
+function setTravel(on){
+  travelOn = on;
+  $("#travelToggle").setAttribute("aria-pressed", String(on));
+  document.documentElement.classList.toggle("motion-off", !on);
+  if (robot) robot.setMotion(on);
+}
+setTravel(travelOn);
+$("#travelToggle").addEventListener("click", () => setTravel(!travelOn));
+
+function setNav(i){ stops.forEach((b,k)=>b.setAttribute("aria-current", String(k===i))); }
+
+function resetPlate(s){
+  s.classList.remove("is-active","in-transit","held","settling","dropping");
+  s.style.transform = "";
+}
+function hidePanel(i){
+  const s = sections[i];
+  resetPlate(s);
+  s.setAttribute("aria-hidden","true"); s.inert = true;
+}
+function showPanel(i, focus){
+  sections.forEach((s,k)=>{ if (k !== i){ resetPlate(s); s.setAttribute("aria-hidden","true"); s.inert = true; } });
+  const s = sections[i];
+  s.removeAttribute("aria-hidden"); s.inert = false;
+  if (!s.classList.contains("is-active")){
+    s.querySelector(".scroll").scrollTop = 0;
+    s.classList.add("is-active");
+  }
+  if (focus) { const h = s.querySelector("h1,h2"); h && h.focus({preventScroll:true}); }
+}
+
+let markerX = [];
+function measureRail(){
+  const railBox = $("#rail").getBoundingClientRect();
+  markerX = stops.map(b => { const r = b.querySelector("i").getBoundingClientRect(); return r.left + r.width/2 - railBox.left; });
+}
+function placeCarriage(p){
+  if (!markerX.length) return;
+  const a = Math.max(0, Math.min(markerX.length-1, Math.floor(p))), b = Math.min(markerX.length-1, a+1), f = Math.max(0, Math.min(1, p-a));
+  $("#carriage").style.transform = `translateX(${markerX[a] + (markerX[b]-markerX[a])*f}px)`;
+}
+
+async function goTo(i, {push=true} = {}){
+  if (i < 0 || i >= STATIONS.length) return;
+  if (busy){ queued = i; window.__timeScale = 2.6; return; }
+  if (i === current){ showPanel(i, true); return; }
+  if (push) history.pushState(null, "", "#"+STATIONS[i].id);
+  busy = true; setNav(i); collapseAll();
+  const from = current;
+  if (robot && travelOn){
+    await robot.transport(from, i, STATIONS[i].label);
+  } else {
+    if (robot) robot.snapTo(i);
+    placeCarriage(i);
+    setStatus("Now at " + STATIONS[i].label);
+  }
+  current = i;
+  showPanel(i, true);
+  announceEl.textContent = "Now at " + STATIONS[i].label;
+  busy = false; window.__timeScale = 1;
+  if (queued !== null){ const q = queued; queued = null; if (q !== current) goTo(q); }
+}
+
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-goto]");
+  if (!g) return;
+  e.preventDefault();
+  goTo(+g.dataset.goto);
+});
+window.addEventListener("popstate", () => goTo(indexFromHash(), {push:false}));
+document.addEventListener("keydown", e => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.target.closest("input,textarea,select,[contenteditable]")) return;
+  const base = busy && queued !== null ? queued : current;
+  if (e.key === "ArrowRight") { e.preventDefault(); goTo(Math.min(STATIONS.length-1, base + 1)); }
+  if (e.key === "ArrowLeft")  { e.preventDefault(); goTo(Math.max(0, base - 1)); }
+});
+
+$("#filters").addEventListener("click", e => {
+  const b = e.target.closest(".filter"); if (!b) return;
+  $$(".filter").forEach(f => f.setAttribute("aria-pressed", String(f===b)));
+  const k = b.dataset.filter;
+  $$(".fixture").forEach(a => { a.hidden = !(k==="all" || a.dataset.cat===k); });
+});
+function toggleItem(btn, itemSel){
+  const item = btn.closest(itemSel);
+  const open = btn.getAttribute("aria-expanded") !== "true";
+  $$(itemSel, item.parentElement).forEach(o => {
+    const ob = o.querySelector("[aria-expanded]");
+    ob.setAttribute("aria-expanded","false"); o.classList.remove("open");
+    document.getElementById(ob.getAttribute("aria-controls")).hidden = true;
+  });
+  if (open){
+    btn.setAttribute("aria-expanded","true"); item.classList.add("open");
+    document.getElementById(btn.getAttribute("aria-controls")).hidden = false;
+    if (robot) robot.pointAt(item);
+  } else if (robot) robot.clearPoint();
+}
+$("#projectList").addEventListener("click", e => { const b = e.target.closest(".fixture-btn"); if (b) toggleItem(b, ".fixture"); });
+$("#timeline").addEventListener("click", e => { const b = e.target.closest(".tl-btn"); if (b) toggleItem(b, ".tl"); });
+$("#bins").addEventListener("click", e => {
+  const b = e.target.closest(".bin"); if (!b) return;
+  const on = b.getAttribute("aria-pressed") !== "true";
+  $$(".bin").forEach(x => x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed", String(on));
+  if (robot) on ? robot.pointAt(b) : robot.clearPoint();
+});
+$("#controls").addEventListener("pointerover", e => { const c = e.target.closest(".ctl"); if (c && robot && e.pointerType === "mouse") robot.pointAt(c); });
+$("#controls").addEventListener("focusin", e => { const c = e.target.closest(".ctl"); if (c && robot) robot.pointAt(c); });
+function collapseAll(){
+  $$("[aria-expanded='true']").forEach(b => { b.setAttribute("aria-expanded","false"); const p = document.getElementById(b.getAttribute("aria-controls")); if (p) p.hidden = true; });
+  $$(".fixture.open,.tl.open").forEach(x => x.classList.remove("open"));
+  $$(".bin").forEach(x => x.setAttribute("aria-pressed","false"));
+  if (robot) robot.clearPoint();
+}
+
+/* ============ Sound (off by default) ============ */
+const Sound = {
+  on:false, ctx:null,
+  start(){
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return false;
+    if (!this.ctx){
+      this.ctx = new C();
+      const o = this.ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = 60;
+      const f = this.ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 380; f.Q.value = 3;
+      const g = this.ctx.createGain(); g.gain.value = 0;
+      o.connect(f); f.connect(g); g.connect(this.ctx.destination); o.start();
+      this.o = o; this.g = g;
+    }
+    this.ctx.resume(); this.on = true; return true;
+  },
+  stop(){ this.on = false; if (this.g) this.g.gain.setTargetAtTime(0, this.ctx.currentTime, .05); },
+  update(speed){
+    if (!this.on || !this.ctx) return;
+    const t = this.ctx.currentTime, s = Math.min(speed, 6);
+    this.g.gain.setTargetAtTime(s > .08 ? Math.min(s*.011, .04) : 0, t, .08);
+    this.o.frequency.setTargetAtTime(52 + s*34, t, .1);
+  },
+  click(){
+    if (!this.on || !this.ctx) return;
+    const n = this.ctx.createBufferSource(), len = this.ctx.sampleRate * .05;
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 4);
+    const bp = this.ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value = 1900; bp.Q.value = 2;
+    const g = this.ctx.createGain(); g.gain.value = .25;
+    n.buffer = buf; n.connect(bp); bp.connect(g); g.connect(this.ctx.destination); n.start();
+  }
+};
+$("#soundToggle").addEventListener("click", e => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  if (on && !Sound.start()) return;
+  if (!on) Sound.stop();
+  e.currentTarget.setAttribute("aria-pressed", String(on));
+});
+
+/* ============ Initial state ============ */
+setNav(current);
+showPanel(current, false);
+setStatus("Now at " + STATIONS[current].label);
+requestAnimationFrame(() => { measureRail(); placeCarriage(current); });
+window.addEventListener("resize", () => { measureRail(); placeCarriage(robot ? robot.railPos() : current); });
+
+/* ============ 3D robot (lazy loaded, optional) ============ */
+function hasWebGL(){
+  try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); }
+  catch(e){ return false; }
+}
+function fallback(){ document.documentElement.classList.add("no-3d"); }
+
+if (!hasWebGL()) { fallback(); return; }
+const sc = document.createElement("script");
+sc.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+sc.async = true;
+sc.onload = () => {
+  const ready = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r=>setTimeout(r,1500))]) : Promise.resolve();
+  ready.then(() => {
+    try { robot = buildRobot(window.THREE); document.documentElement.classList.add("robot-on"); }
+    catch(err){ console.error(err); fallback(); }
+  });
+};
+sc.onerror = fallback;
+document.head.appendChild(sc);
+
+function buildRobot(THREE){
+  const V3 = THREE.Vector3, PI = Math.PI;
+  const SPACING = 9;
+  const L1 = 1.8, L2 = 1.6, TIP = .52, H = 1.1, REACH = L1 + L2 + TIP - .1;
+  const READY = new V3(1.55, 2.45, .85), READY_PITCH = -.5;
+  const ROLL = PI/2;          // fingers pinch the tab from above and below
+  const GRIP_TAB = .08;
+
+  const stage = $("#stage");
+  const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+  const canvas = renderer.domElement;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0c0a11);
+  scene.fog = new THREE.Fog(0x0c0a11, 13, 32);
+  const camera = new THREE.PerspectiveCamera(36, 1, .1, 100);
+  const camBase = new V3(), look = new V3();
+
+  scene.add(new THREE.HemisphereLight(0xb4a6d6, 0x07060a, .55));
+  const key = new THREE.DirectionalLight(0xf6efff, 1.05);
+  key.position.set(4.5, 9, 6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, {left:-7,right:7,top:7,bottom:-7,near:1,far:30});
+  key.shadow.bias = -.0006;
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xa56bff, .8); rim.position.set(-6, 4, -5); scene.add(rim);
+
+  const M = (o) => new THREE.MeshStandardMaterial(o);
+  const paint = M({color:0x141218, roughness:.3, metalness:.35});
+  const dark = M({color:0x2a2633, roughness:.45, metalness:.5});
+  const trim = M({color:0x6a3fd0, roughness:.4, metalness:.2, emissive:0x2a1060, emissiveIntensity:.5});
+  const steel = M({color:0x5b5469, roughness:.36, metalness:.55});
+  const rubber = M({color:0x0d0b11, roughness:.9});
+
+  const mesh = (g, m, cast=true) => { const x = new THREE.Mesh(g, m); x.castShadow = cast; x.receiveShadow = true; return x; };
+  const cylZ = (r, len, m) => { const g = new THREE.CylinderGeometry(r, r, len, 36); g.rotateX(PI/2); return mesh(g, m); };
+  const cylX = (r, len, m, x0=0) => { const g = new THREE.CylinderGeometry(r, r, len, 28); g.rotateZ(-PI/2); g.translate(x0 + len/2, 0, 0); return mesh(g, m); };
+  const boxX = (l, h, w, m, x0=0) => { const g = new THREE.BoxGeometry(l, h, w); g.translate(x0 + l/2, 0, 0); return mesh(g, m); };
+
+  /* Track: floor, rail and station plates slide past the arm */
+  const track = new THREE.Group(); scene.add(track);
+  const gc = document.createElement("canvas"); gc.width = gc.height = 128;
+  const gx = gc.getContext("2d");
+  gx.fillStyle = "#0e0c13"; gx.fillRect(0,0,128,128);
+  gx.strokeStyle = "#261d36"; gx.lineWidth = 2; gx.strokeRect(0,0,128,128);
+  gx.strokeStyle = "#17121f"; gx.lineWidth = 1; gx.beginPath(); gx.moveTo(64,0); gx.lineTo(64,128); gx.moveTo(0,64); gx.lineTo(128,64); gx.stroke();
+  const gridTex = new THREE.CanvasTexture(gc);
+  gridTex.wrapS = gridTex.wrapT = THREE.RepeatWrapping; gridTex.repeat.set(80, 20);
+  gridTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  const floor = mesh(new THREE.PlaneGeometry(160, 40), M({map:gridTex, roughness:.92, metalness:0}), false);
+  floor.rotation.x = -PI/2; floor.position.x = 22; track.add(floor);
+
+  [-.36, .36].forEach(z => { const r = mesh(new THREE.BoxGeometry(160, .07, .09), steel); r.position.set(22, .085, z); track.add(r); });
+  const sleeperCount = 170, sleepers = new THREE.InstancedMesh(new THREE.BoxGeometry(.16, .05, 1.2), dark, sleeperCount);
+  const dummy = new THREE.Object3D();
+  for (let i=0;i<sleeperCount;i++){ dummy.position.set(-50 + i*.9, .025, 0); dummy.updateMatrix(); sleepers.setMatrixAt(i, dummy.matrix); }
+  sleepers.receiveShadow = true; track.add(sleepers);
+
+  function plateTexture(label){
+    const c = document.createElement("canvas"); c.width = 1024; c.height = 320;
+    const x = c.getContext("2d");
+    x.fillStyle = "#15111d"; x.fillRect(0,0,1024,320);
+    x.save(); x.beginPath(); x.rect(0,0,70,320); x.clip();
+    for (let i=-4;i<16;i++){ x.fillStyle = i%2 ? "#a56bff" : "#15111d"; x.beginPath(); x.moveTo(0, i*40); x.lineTo(70, i*40-40); x.lineTo(70, i*40); x.lineTo(0, i*40+40); x.fill(); }
+    x.restore();
+    x.fillStyle = "#eeeaf6"; x.font = "800 150px Archivo, Arial, sans-serif"; x.textBaseline = "middle";
+    x.fillText(label, 120, 170);
+    const t = new THREE.CanvasTexture(c); t.anisotropy = renderer.capabilities.getMaxAnisotropy(); return t;
+  }
+  STATIONS.forEach((s, i) => {
+    const plate = mesh(new THREE.PlaneGeometry(3.2, 1), M({map:plateTexture(s.label), roughness:.8}), false);
+    plate.rotation.x = -PI/2; plate.position.set(i*SPACING + 2.4, .012, 2.4); track.add(plate);
+  });
+
+  /* The arm */
+  const carriage = mesh(new THREE.BoxGeometry(1.5, .32, 1.1), dark); carriage.position.y = .25; scene.add(carriage);
+  [-.5, .5].forEach(x => [-.36, .36].forEach(z => { const w = cylZ(.09, .12, rubber); w.position.set(x, .12, z); scene.add(w); }));
+  const base = mesh(new THREE.CylinderGeometry(.42, .48, .4, 40), paint); base.position.y = .61; scene.add(base);
+
+  const yawG = new THREE.Group(); yawG.position.y = .81; scene.add(yawG);
+  const turret = mesh(new THREE.CylinderGeometry(.38, .4, .28, 40), dark); turret.position.y = .14; yawG.add(turret);
+  const shoulderG = new THREE.Group(); shoulderG.position.y = .29; yawG.add(shoulderG);
+  shoulderG.add(cylZ(.3, .58, dark)); shoulderG.add(cylZ(.2, .62, steel));
+  shoulderG.add(boxX(L1, .34, .3, paint));
+  shoulderG.add(boxX(L1*.55, .05, .31, trim, L1*.22));
+  const cable = cylX(.03, L1*.8, rubber, L1*.1); cable.position.set(0, .2, .1); shoulderG.add(cable);
+  const elbowG = new THREE.Group(); elbowG.position.x = L1; shoulderG.add(elbowG);
+  elbowG.add(cylZ(.24, .44, dark)); elbowG.add(cylZ(.15, .47, steel));
+  elbowG.add(cylX(.15, L2, paint));
+  const wristG = new THREE.Group(); wristG.position.x = L2; elbowG.add(wristG);
+  wristG.add(cylZ(.15, .36, dark));
+  const rollG = new THREE.Group(); wristG.add(rollG);
+  rollG.add(cylX(.12, .16, steel, .1));
+  rollG.add(boxX(.1, .16, .38, dark, .26));
+  const fingers = [-1, 1].map(s => {
+    const f = new THREE.Group();
+    f.add(boxX(.32, .07, .05, steel, .34));
+    const pad = boxX(.14, .075, .02, rubber, .52); pad.position.z = -s*.03; f.add(pad);
+    rollG.add(f); f.userData.s = s; return f;
+  });
+  const tip = new THREE.Object3D(); tip.position.x = TIP; rollG.add(tip);
+  const tipLight = new THREE.PointLight(0xb98aff, .7, 3); tipLight.position.x = TIP; rollG.add(tipLight);
+
+  /* Kinematics */
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  function ik(p, pitch, roll){
+    const q1 = Math.atan2(-p.z, p.x);
+    const r = Math.hypot(p.x, p.z), y = p.y - H;
+    const wx = r - TIP*Math.cos(pitch), wy = y - TIP*Math.sin(pitch);
+    const d = clamp(Math.hypot(wx, wy), Math.abs(L1-L2) + .05, L1 + L2 - .02);
+    const q3 = -Math.acos(clamp((d*d - L1*L1 - L2*L2) / (2*L1*L2), -1, 1));
+    const q2 = clamp(Math.atan2(wy, wx) - Math.atan2(L2*Math.sin(q3), L1 + L2*Math.cos(q3)), -.4, 2.8);
+    return [q1, q2, q3, pitch - q2 - q3, roll];
+  }
+
+  const q = ik(READY, READY_PITCH, 0), cmd = q.slice(), v = [0,0,0,0,0], dist = [0,0,0,0,0];
+  let g = .05, gCmd = .05;
+  const K = 240, D = 2*.74*Math.sqrt(K);
+
+  let armToken = 0;
+  const claim = () => ++armToken;
+  const tweens = new Set();
+  const minJerk = s => s*s*s*(10 - 15*s + 6*s*s);
+  function tween(dur, fn, token){ return new Promise(res => tweens.add({t:0, dur:Math.max(dur, .001), fn, token, res})); }
+  const sleepS = (s, token) => tween(s, () => {}, token);
+  function moveJ(target, dur, token){
+    const from = cmd.slice();
+    return tween(dur, e => { for (let i=0;i<5;i++) cmd[i] = from[i] + (target[i]-from[i])*e; }, token);
+  }
+  function moveL(p0, p1, pitch0, pitch1, roll, dur, token){
+    const p = new V3();
+    return tween(dur, e => { p.copy(p0).lerp(p1, e); const t = ik(p, pitch0 + (pitch1-pitch0)*e, roll); for (let i=0;i<5;i++) cmd[i] = t[i]; }, token);
+  }
+  function grip(target, dur, token){ const from = gCmd; return tween(dur, e => { gCmd = from + (target-from)*e; }, token); }
+
+  /* Screen <-> workspace */
+  const raycaster = new THREE.Raycaster(), ndc = new THREE.Vector2(), shoulder = new V3(0, H, 0);
+  function screenTo3D(sx, sy){
+    const cr = canvas.getBoundingClientRect();
+    ndc.set(((sx - cr.left)/cr.width)*2 - 1, -((sy - cr.top)/cr.height)*2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const o = raycaster.ray.origin, d = raycaster.ray.direction;
+    // the point on this sight line closest to the shoulder keeps the tip exactly under the cursor point
+    let t = Math.max(0, shoulder.clone().sub(o).dot(d));
+    let p = o.clone().addScaledVector(d, t);
+    if (p.y < .35 && d.y < 0){ t = (.35 - o.y)/d.y; p = o.clone().addScaledVector(d, t); }
+    const off = p.clone().sub(shoulder);
+    if (off.length() > REACH) p = shoulder.clone().addScaledVector(off.normalize(), REACH);
+    return p;
+  }
+  function approach(p, back=.38){
+    const off = p.clone().sub(shoulder), L = off.length() || 1;
+    const pitch = clamp(Math.asin(off.y / L), -1.35, .9);
+    const hr = Math.hypot(p.x, p.z) || 1;
+    const a = new V3(p.x/hr*Math.cos(pitch), Math.sin(pitch), p.z/hr*Math.cos(pitch));
+    return { pitch, pre: p.clone().addScaledVector(a, -back) };
+  }
+  const tipW = new V3(), tipS = {x:0, y:0};
+  function tipScreen(){
+    const cr = canvas.getBoundingClientRect();
+    tip.getWorldPosition(tipW).project(camera);
+    tipS.x = cr.left + (tipW.x + 1)/2*cr.width; tipS.y = cr.top + (1 - tipW.y)/2*cr.height;
+    return tipS;
+  }
+  function tabCenter(el){ const r = el.querySelector(".grab-tab").getBoundingClientRect(); return {x:r.left + r.width/2, y:r.top + r.height/2}; }
+
+  /* Holding a page: the plate follows the gripper tip every frame */
+  let held = null;
+  function hold(el, bx, by, r0){
+    const t = tipScreen();
+    held = {el, bx, by, r0, t0x:t.x, t0y:t.y, d0:Math.hypot(bx, by) || 1, x:bx, y:by, r:r0};
+    el.classList.remove("settling"); el.classList.add("held");
+  }
+  function updateHeld(){
+    if (!held) return;
+    const t = tipScreen();
+    const x = held.bx + t.x - held.t0x, y = held.by + t.y - held.t0y;
+    const r = held.r0 ? held.r0 * Math.min(1, Math.hypot(x, y)/held.d0) : clamp(-x*.02 + y*.012, -7, 7);
+    held.x = x; held.y = y; held.r = r;
+    held.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${r.toFixed(2)}deg)`;
+  }
+  function drop(el){
+    const h = held; held = null;
+    el.classList.remove("held"); el.classList.add("dropping");
+    el.style.transform = `translate(${h.x - 60}px,${h.y + innerHeight}px) rotate(${h.r + 12}deg)`;
+  }
+  function release(el){
+    held = null;
+    el.classList.remove("held"); el.classList.add("settling");
+    el.style.transform = "translate(0px,0px) rotate(0deg)";
+    setTimeout(() => { el.classList.remove("settling"); el.style.transform = ""; }, 480);
+  }
+  function present(el, start){
+    resetPlate(el);
+    el.style.transform = `translate(${start.dx}px,${start.dy + innerHeight*.6}px) rotate(${start.r}deg)`;
+    el.classList.add("in-transit");
+    void el.offsetWidth;
+    el.classList.add("settling");
+    el.style.transform = `translate(${start.dx}px,${start.dy}px) rotate(${start.r}deg)`;
+  }
+
+  /* Track motion */
+  let trackX = -current*SPACING, trackV = 0, trackA = 0, prevTrackX = trackX, prevTrackV = 0;
+  track.position.x = trackX;
+  function travelTrack(from, to, dur){ return tween(dur, e => { trackX = -(from + (to-from)*e) * SPACING; }); }
+
+  let motionOn = travelOn, mobile = false;
+  let pointing = false, pointUntil = 0, laserEl = null;
+
+  async function transport(from, to, label){
+    const tk = claim(); pointing = false; laserEl = null; hideLaser();
+    const W = innerWidth, Hh = innerHeight;
+    const oldEl = sections[from], newEl = sections[to];
+
+    // 1. Reach for the current page's tab and grab it
+    const hA = tabCenter(oldEl);
+    const pA = screenTo3D(hA.x, hA.y), aA = approach(pA);
+    setStatus("Grabbing the page");
+    await Promise.all([moveJ(ik(aA.pre, aA.pitch, ROLL), .8, tk), grip(1, .4, tk)]);
+    await moveL(aA.pre, pA, aA.pitch, aA.pitch, ROLL, .34, tk);
+    await sleepS(.05, tk);
+    await grip(GRIP_TAB, .18, tk); Sound.click();
+    hold(oldEl, 0, 0, 0);
+
+    // 2. Yank it out of the way and let it fall
+    setStatus("Taking you to " + label);
+    const pull = mobile ? {x:hA.x - .2*W, y:hA.y + .14*Hh} : {x:hA.x - .08*W, y:hA.y + .24*Hh};
+    const pP = screenTo3D(pull.x, pull.y), aP = approach(pP);
+    await moveL(pA, pP, aA.pitch, aP.pitch, ROLL, .55, tk);
+    await grip(1, .12, tk); Sound.click();
+    drop(oldEl);
+    setTimeout(() => { if (!oldEl.classList.contains("is-active") || oldEl.classList.contains("dropping")) hidePanel(from); }, 820);
+
+    // 3. Ride the rail to the next station; the next page rises into reach
+    const tdur = 1.2 + .28*Math.abs(to - from);
+    const hB = tabCenter(newEl);
+    const start = mobile ? {dx:.2*W, dy:.16*Hh, r:5} : {dx:-.03*W, dy:.32*Hh, r:-6};
+    const pS = screenTo3D(hB.x + start.dx, hB.y + start.dy), aS = approach(pS);
+    const pB = screenTo3D(hB.x, hB.y), aB = approach(pB);
+    await Promise.all([
+      (async () => {
+        await moveJ(ik(READY, READY_PITCH, 0), .7, tk);
+        await sleepS(Math.max(0, tdur - 1.3), tk);
+        await moveJ(ik(aS.pre, aS.pitch, ROLL), .8, tk);
+      })(),
+      travelTrack(from, to, tdur),
+      (async () => { await sleepS(Math.max(0, tdur - .55)); present(newEl, start); })()
+    ]);
+
+    // 4. Grab the new page and pull it into place
+    setStatus("Bringing in " + label);
+    await sleepS(.2, tk);
+    await moveL(aS.pre, pS, aS.pitch, aS.pitch, ROLL, .34, tk);
+    await grip(GRIP_TAB, .18, tk); Sound.click();
+    hold(newEl, start.dx, start.dy, start.r);
+    await moveL(pS, pB, aS.pitch, aB.pitch, ROLL, .75, tk);
+    await sleepS(.05, tk);
+    await grip(1, .14, tk); Sound.click();
+    release(newEl);
+    newEl.classList.remove("in-transit");
+    showPanel(to, true);
+    setStatus("Now at " + label);
+    await moveL(pB, aB.pre, aB.pitch, aB.pitch, ROLL, .3, tk);
+    moveJ(ik(READY, READY_PITCH, 0), 1.0, tk);
+    grip(.05, .45, tk);
+  }
+
+  function snapTo(i){
+    claim(); tweens.forEach(tw => tw.res(false)); tweens.clear();
+    if (held){ held.el.classList.remove("held"); held.el.style.transform = ""; held = null; }
+    trackX = -i*SPACING; prevTrackX = trackX; trackV = trackA = prevTrackV = 0;
+    const t = ik(READY, READY_PITCH, 0);
+    for (let k=0;k<5;k++){ cmd[k] = q[k] = t[k]; v[k] = 0; }
+    gCmd = g = .05;
+    pointing = false; laserEl = null; hideLaser();
+  }
+
+  /* Pointing at page elements, with a laser line */
+  async function pointAt(el){
+    if (busy) return;
+    const tk = claim();
+    pointing = true; pointUntil = performance.now() + 7000; laserEl = null; hideLaser();
+    const r = el.getBoundingClientRect();
+    const target = screenTo3D(r.left + Math.min(r.width/2, 60), r.top + Math.min(r.height/2, 40));
+    const a = approach(target, .9);
+    if (motionOn){
+      await Promise.all([moveJ(ik(a.pre, a.pitch, 0), .8, tk), grip(.45, .4, tk)]);
+    } else {
+      const t = ik(a.pre, a.pitch, 0); for (let k=0;k<5;k++){ cmd[k] = q[k] = t[k]; v[k] = 0; } gCmd = g = .45;
+    }
+    if (tk === armToken) laserEl = el;
+  }
+  function clearPoint(){ laserEl = null; hideLaser(); pointUntil = 0; }
+
+  const laser = $("#laser"), lLine = $("#laserLine"), lDot = $("#laserDot");
+  function hideLaser(){ laser.classList.remove("on"); }
+  function updateLaser(){
+    if (!laserEl || !laserEl.isConnected || laserEl.closest("[inert]") || laserEl.hidden){ if (laser.classList.contains("on")) hideLaser(); return; }
+    const r = laserEl.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight || r.width === 0){ hideLaser(); return; }
+    const t = tipScreen();
+    const tx = clamp(t.x, r.left, r.right), ty = clamp(t.y, r.top + 10, Math.max(r.top + 10, Math.min(r.bottom - 10, r.top + 40)));
+    lLine.setAttribute("x1", t.x); lLine.setAttribute("y1", t.y); lLine.setAttribute("x2", tx); lLine.setAttribute("y2", ty);
+    lDot.setAttribute("cx", tx); lDot.setAttribute("cy", ty);
+    laser.classList.add("on");
+  }
+
+  /* Idle: look around, flex the gripper */
+  (async function idle(){
+    for (;;){
+      await new Promise(r => setTimeout(r, 2400 + Math.random()*2600));
+      if (busy || !motionOn || document.hidden) continue;
+      if (pointing && performance.now() < pointUntil) continue;
+      if (pointing){ pointing = false; laserEl = null; hideLaser(); }
+      const tk = claim();
+      const p = READY.clone().add(new V3((Math.random()-.5)*.9, (Math.random()-.5)*.6, (Math.random()-.5)*1.2));
+      await moveJ(ik(p, READY_PITCH + (Math.random()-.5)*.8, (Math.random()-.5)*1.2), 1.6 + Math.random()*.8, tk);
+      if (tk === armToken && Math.random() < .45){ await grip(.75, .35, tk); await grip(.05, .35, tk); }
+    }
+  })();
+
+  function resize(){
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    mobile = innerWidth <= 820;
+    camera.aspect = w / h;
+    if (mobile){
+      camera.fov = 44; camBase.set(1.5, 4.4, 11.5); look.set(1.4, 1.5, .6); camera.setViewOffset(w, h, 0, h*.2, w, h);
+    } else {
+      camera.fov = 36; camBase.set(1.2, 3.6, 9.8); look.set(1.4, 1.45, .6); camera.setViewOffset(w, h, w*.2, 0, w, h);
+    }
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const els = [0,1,2,3,4].map(i => $("#j"+i)), railEl = $("#railPos"), gripEl = $("#gripState");
+  let last = performance.now(), frame = 0, camOff = 0, time = 0;
+  function loop(now){
+    requestAnimationFrame(loop);
+    const rdt = Math.min((now - last)/1000, 1/20); last = now;
+    const dt = rdt * window.__timeScale; time += rdt;
+
+    for (const tw of tweens){
+      if (tw.token !== undefined && tw.token !== armToken){ tweens.delete(tw); tw.res(false); continue; }
+      tw.t += dt; const s = Math.min(tw.t / tw.dur, 1);
+      tw.fn(minJerk(s));
+      if (s >= 1){ tweens.delete(tw); tw.res(true); }
+    }
+
+    track.position.x = trackX;
+    trackV = dt > 0 ? (trackX - prevTrackX)/dt : 0;
+    trackA = dt > 0 ? (trackV - prevTrackV)/dt : 0;
+    prevTrackX = trackX; prevTrackV = trackV;
+    dist[0] = clamp(trackA, -40, 40) * .55;
+    dist[3] = clamp(trackA, -40, 40) * .4;
+
+    let speed = Math.abs(trackV)*.06;
+    const hstep = dt/2;
+    for (let n=0;n<2;n++) for (let i=0;i<5;i++){
+      const a = K*(cmd[i]-q[i]) - D*v[i] + dist[i];
+      v[i] += a*hstep; q[i] += v[i]*hstep;
+    }
+    for (let i=0;i<5;i++) speed += Math.abs(v[i]);
+    g += (gCmd - g) * Math.min(1, dt*14);
+
+    const jit = i => motionOn && !held ? Math.sin(time*(1.7+i*.37) + i*2.1)*.004 : 0;
+    yawG.rotation.y = q[0] + jit(0);
+    shoulderG.rotation.z = q[1] + jit(1);
+    elbowG.rotation.z = q[2] + jit(2);
+    wristG.rotation.z = q[3] + jit(3);
+    rollG.rotation.x = q[4];
+    fingers.forEach(f => { f.position.z = f.userData.s * (.075 + g*.13); });
+
+    camOff += ((-trackV*.035) - camOff) * Math.min(1, rdt*3);
+    camera.position.set(camBase.x + camOff, camBase.y + Math.sin(time*.35)*.04, camBase.z);
+    camera.lookAt(look.x + camOff*.5, look.y, look.z);
+
+    renderer.render(scene, camera);
+    updateHeld();
+    updateLaser();
+    Sound.update(speed);
+
+    if ((frame++ & 3) === 0){
+      for (let i=0;i<5;i++) els[i].textContent = (q[i]*180/PI).toFixed(1) + "°";
+      railEl.textContent = (-trackX).toFixed(2) + " m";
+      gripEl.textContent = held ? "Holding page" : (g > .6 ? "Open" : "Closed");
+    }
+    if (busy) placeCarriage(-trackX / SPACING);
+  }
+  requestAnimationFrame(loop);
+
+  return {
+    transport, snapTo, pointAt, clearPoint,
+    railPos: () => -trackX / SPACING,
+    setMotion(on){ motionOn = on; if (!on && !busy) snapTo(current); }
+  };
+}
+})();
+</script>
+</body>
+</html>
