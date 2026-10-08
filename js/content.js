@@ -36,7 +36,7 @@ const PROJECTS = [
     tech:["MuJoCo","Python","Kalman filter","UR5e","Dynamixel XL330"], links:[] },
   { name:"BLOC", cat:"robotics",
     summary:"LEGO assembly with a UR5 arm in Isaac Lab",
-    description:"A robot that assembles LEGO structures, trained and tested in NVIDIA Isaac Lab as part of Project STEP through Purdue's Vertically Integrated Projects program.",
+    description:"A robot that assembles LEGO structures, trained and tested in NVIDIA Isaac Lab",
     role:"Environment setup, task design, and training runs.",
     tech:["Isaac Lab","Isaac Sim","UR5","PyTorch","Reinforcement learning"], links:[] },
   { name:"Warehouse robot simulation", cat:"robotics",
@@ -74,8 +74,6 @@ const PROJECTS = [
 const EXPERIENCE = [
   { org:"NYU ARC Robotics", role:"Controls subteam member", when:"Sep 2026 – now", now:true,
     body:"ROS 2, Nav2, and SLAM on NVIDIA Jetson for NYU's combat robotics team, supporting readiness for the ARCC and RoboMaster North America competitions. I keep the team's weekly VIP engineering notebook." },
-  { org:"Project STEP, Purdue VIP", role:"Humanoid robotics research", when:"Current", now:true,
-    body:"Humanoid RL training and the BLOC LEGO-assembly task in NVIDIA Isaac Lab, through Purdue's Vertically Integrated Projects program." },
   { org:"Plantaer", role:"Engineering intern", when:"Feb – Aug 2026",
     body:"Led end-to-end hardware development of a solar-powered, off-grid smart irrigation system, delivered as a $20K customer pilot deployed on Governors Island." },
   { org:"CUNY Tech Prep", role:"Data Science Fellow", when:"Jul 2025 – Jul 2026",
