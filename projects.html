@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Josiah Bernard | Robotics, Embedded Systems &amp; Software Developer</title>
+<meta name="description" content="Portfolio of Josiah Bernard, ECE student at NYU Tandon working on robotics, robot learning, and embedded systems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#panels">Skip to content</a>
+<div id="stage" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="#home" data-goto="0"><b>Josiah Bernard</b><span>Robotics, Embedded Systems &amp; Software Developer</span></a>
+  <div class="toggles">
+    <button class="toggle" id="travelToggle" type="button" aria-pressed="true">Robot travel</button>
+    <button class="toggle" id="soundToggle" type="button" aria-pressed="false">Sound</button>
+  </div>
+</header>
+
+<p class="status" id="status" aria-hidden="true">Now at Home</p>
+<div class="telemetry" aria-hidden="true">
+  <span>J1 <b id="j0">0.0°</b></span><span>J2 <b id="j1">0.0°</b></span><span>J3 <b id="j2">0.0°</b></span><span>J4 <b id="j3">0.0°</b></span><span>J5 <b id="j4">0.0°</b></span>
+  <span class="wide"><span>Rail <b id="railPos">0.00 m</b></span><span>Gripper <b id="gripState">Closed</b></span></span>
+</div>
+<div class="sr-only" aria-live="polite" id="announce"></div>
+<svg class="laser" id="laser" aria-hidden="true"><line id="laserLine" x1="0" y1="0" x2="0" y2="0"/><circle id="laserDot" r="4" cx="0" cy="0"/></svg>
+
+<main class="panels" id="panels">
+  <section class="station station-home" id="home" aria-labelledby="h-home"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h1 class="hero-name" id="h-home" tabindex="-1">Josiah<br>Bernard</h1>
+    <p class="hero-role">Robotics, Embedded Systems &amp; Software Developer</p>
+    <p class="hero-copy">I build robots end to end: the circuits, the control code, and the software that decides what they do next. My work ranges from a solar-powered irrigation system running outdoors on Governors Island to ROS 2 navigation on NVIDIA Jetson and manipulation trained in Isaac Lab and MuJoCo. I study Electrical and Computer Engineering at NYU Tandon.</p>
+    <button class="cta" type="button" data-goto="1">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h16M7 20v-4l4-6 5 2M11 10l-1-5h4"/><circle cx="16" cy="12" r="1.6" fill="currentColor"/></svg>
+      Let the robot show you around
+    </button>
+    <p class="hint">The robot grabs this page and swaps in the next one. You can also pick a stop on the rail below or use <kbd>←</kbd> <kbd>→</kbd>.</p>
+  </div></section>
+
+  <section class="station" id="about" aria-labelledby="h-about"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-about" tabindex="-1">About</h2>
+    <p class="lede">I like the moment code leaves the screen and something physical moves.</p>
+    <p>I'm an Electrical and Computer Engineering student at NYU Tandon, and I work across the whole stack of a robot: wiring and motor drivers, embedded control, navigation, perception, and the learning systems on top.</p>
+    <p>Recently that's meant leading hardware for an off-grid irrigation system now deployed as a paying customer pilot, building navigation for NYU's combat robotics team, and training manipulation tasks in NVIDIA Isaac Lab and MuJoCo. At CUNY I built a robot tutor that adapts to autistic children's emotions and presented it at the BARS Symposium.</p>
+    <p>I started in computer science at BMCC, graduating with honors, and spent a year as a CUNY Tech Prep fellow mentored by Amazon engineers. The thread through all of it: I want the things I build to work outside the lab.</p>
+    <dl class="facts">
+      <dt>Based in</dt><dd>Brooklyn, NY</dd>
+      <dt>Studying</dt><dd>B.S. Electrical &amp; Computer Engineering, NYU Tandon, expected May 2028</dd>
+      <dt>Focus</dt><dd>Robot navigation and manipulation, embedded control, GPU computing</dd>
+      <dt>Looking for</dt><dd>Summer 2027 internships in robotics</dd>
+    </dl>
+    <button class="next" type="button" data-goto="2">Next stop: Projects</button>
+  </div></section>
+
+  <section class="station" id="projects" aria-labelledby="h-projects"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-projects" tabindex="-1">Projects</h2>
+    <p class="lede">Things I've built, from field-deployed hardware to simulation. Open one and the arm will point you to it.</p>
+    <div class="filters" role="group" aria-label="Filter projects" id="filters"></div>
+    <div class="fixtures" id="projectList"></div>
+    <button class="next" type="button" data-goto="3">Next stop: Experience</button>
+  </div></section>
+
+  <section class="station" id="experience" aria-labelledby="h-experience"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-experience" tabindex="-1">Experience</h2>
+    <p class="lede">Teams, research, and school, most recent first.</p>
+    <ol class="timeline" id="timeline"></ol>
+    <button class="next" type="button" data-goto="4">Next stop: Skills</button>
+  </div></section>
+
+  <section class="station" id="skills" aria-labelledby="h-skills"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-skills" tabindex="-1">Skills</h2>
+    <p class="lede">The parts bins I reach into most. Select a bin to have the robot pick it out.</p>
+    <div class="bins" id="bins"></div>
+    <button class="next" type="button" data-goto="5">Next stop: Contact</button>
+  </div></section>
+
+  <section class="station" id="contact" aria-labelledby="h-contact"><span class="grab-tab" aria-hidden="true"></span><div class="scroll">
+    <h2 id="h-contact" tabindex="-1">Contact</h2>
+    <p class="lede">End of the line. I'm looking for summer 2027 internships in robotics and embedded systems, and I'm always happy to talk about a build.</p>
+    <div class="controls" id="controls"></div>
+    <button class="next" type="button" data-goto="0">Back to the start</button>
+  </div></section>
+</main>
+
+<nav class="railnav" aria-label="Sections">
+  <ol class="rail" id="rail"></ol>
+</nav>
+
+<script src="js/content.js" defer></script>
+<script src="js/robot.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
