@@ -17,7 +17,10 @@ const PROJECTS = [
     summary:"Solar-powered irrigation, deployed on Governors Island",
     description:"A solar-powered, off-grid irrigation controller taken from first prototype to a field-ready deployment. A Raspberry Pi 4 drives solenoid valves through relay control logic, and a Flask web server lets growers monitor and run watering remotely. Delivered as a $20K customer pilot on Governors Island, where it validated performance in a real outdoor environment.",
     role:"Led the end-to-end hardware development as an engineering intern at Plantaer.",
-    tech:["Raspberry Pi 4","Python","Flask","Relay control","Solenoid valves","Solar power"], links:[{label:"Demo", media:"images/Irrigation_Systen.mp4"}] },
+    tech:["Raspberry Pi 4","Python","Flask","Relay control","Solenoid valves","Solar power"],
+    media:[{type:"video", src:"images/irrigation-demo.mp4"}],
+    links:[]
+  },
   { name:"Emotionally intelligent robot tutor", cat:"robotics",
     summary:"Adaptive human-robot interaction for autistic children",
     description:"A ROS-based tutoring robot that combines speech, vision, and gesture recognition with SLAM so it can move around a room and adapt how it teaches to a child's emotional state. I presented the research at the BARS Symposium to an audience of more than 100 researchers and faculty.",
