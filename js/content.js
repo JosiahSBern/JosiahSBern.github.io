@@ -1,15 +1,14 @@
-/* content.js: everything you'd edit to update the portfolio text.
-   Add projects, experience, and skills here; the page renders from these lists. */
+/* content.js: projects, experience, and skills here */
 const PROFILE = {
   name: "Josiah Bernard",
   role: "Robotics, Embedded Systems & Software Developer",
   email: "josiahrbernard@gmail.com",
   github: "https://github.com/JosiahSBern",
   linkedin: "https://www.linkedin.com/in/josiah-st-bernard",
-  resume: "resume.pdf"   // the PDF sitting next to index.html in the repo
+  resume: "resume.pdf" 
 };
 
-const CATS = { robotics:"Robotics", robomaster:"Competition robotics", embedded:"Embedded", gpu:"GPU & ML", software:"Software" };
+const CATS = { robotics:"Robotics", embedded:"Embedded", gpu:"GPU & ML", software:"Software" };
 
 // links: [{label:"Code", href:"https://github.com/..."}, {label:"Demo", href:"..."}]
 // media: {type:"img"|"video", src:"...", alt:"..."}
@@ -27,7 +26,7 @@ const PROJECTS = [
     links:[{label:"Code", href:"https://github.com/JosiahSBern/emotion-aware-robot-tutor"}, 
       {label:"Emotional TTS server", href:"https://github.com/JosiahSBern/emotional-TTS-server"},
       {label:"Poster",href:"images/BARS.pdf"}] },
-  { name:"NYU ARC controls", cat:"robomaster",
+  { name:"NYU ARC controls", cat:"robotics",
     summary:"ROS 2 navigation for a competition robotics team",
     description:"Controls work for NYU's combat robotics team, building navigation on ROS 2, Nav2, and SLAM running on an NVIDIA Jetson to get the robots ready for the ARCC and RoboMaster North America competitions. I keep a weekly engineering notebook of design iterations, test results, and next steps.",
     role:"Controls subteam member.",
@@ -47,7 +46,7 @@ const PROJECTS = [
     description:"A ROS 2 warehouse system in which robots map and navigate autonomously with SLAM and Nav2, while an AI-based dispatcher assigns tasks across the fleet and keeps robots from colliding.",
     role:"Solo project.",
     tech:["ROS 2","Nav2","SLAM","Python"], links:[] },
-  { name:"NeuroPBR", cat:"gpu",
+  { name:"NeuroPBR", cat:"software",
     summary:"End-to-end PBR material reconstruction",
     description:"A system that reconstructs physically based rendering (PBR) materials end to end, running a Core ML model on device with custom Metal shaders for rendering. Built during the CUNY Tech Prep fellowship and presented at LinkedIn HQ.",
     role:"Data Science Fellow, CUNY Tech Prep.",
