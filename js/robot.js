@@ -1,7 +1,7 @@
 /* robot.js: the Three.js arm, its kinematics, and the page-grabbing sequences.
    Loaded before main.js; main.js calls buildRobot(THREE, App) once Three.js arrives. */
 function buildRobot(THREE, App){
-  const { sections, STATIONS, $, setStatus, showPanel, hidePanel, resetPlate, placeCarriage, Sound } = App;
+  const { sections, STATIONS, $, setStatus, showPanel, hidePanel, resetPlate, placeCarriage } = App;
   const V3 = THREE.Vector3, PI = Math.PI;
   const SPACING = 9;
   const L1 = 1.8, L2 = 1.6, TIP = .52, H = 1.1, REACH = L1 + L2 + TIP - .1;
@@ -227,7 +227,7 @@ function buildRobot(THREE, App){
     await Promise.all([moveJ(ik(aA.pre, aA.pitch, ROLL), .8, tk), grip(1, .4, tk)]);
     await moveL(aA.pre, pA, aA.pitch, aA.pitch, ROLL, .34, tk);
     await sleepS(.05, tk);
-    await grip(GRIP_TAB, .18, tk); Sound.click();
+    await grip(GRIP_TAB, .18, tk);
     hold(oldEl, 0, 0, 0);
 
     // 2. Yank it out of the way and let it fall
@@ -235,7 +235,7 @@ function buildRobot(THREE, App){
     const pull = mobile ? {x:hA.x - .2*W, y:hA.y + .14*Hh} : {x:hA.x - .08*W, y:hA.y + .24*Hh};
     const pP = screenTo3D(pull.x, pull.y), aP = approach(pP);
     await moveL(pA, pP, aA.pitch, aP.pitch, ROLL, .55, tk);
-    await grip(1, .12, tk); Sound.click();
+    await grip(1, .12, tk);
     drop(oldEl);
     setTimeout(() => { if (!oldEl.classList.contains("is-active") || oldEl.classList.contains("dropping")) hidePanel(from); }, 820);
 
@@ -259,11 +259,11 @@ function buildRobot(THREE, App){
     setStatus("Bringing in " + label);
     await sleepS(.2, tk);
     await moveL(aS.pre, pS, aS.pitch, aS.pitch, ROLL, .34, tk);
-    await grip(GRIP_TAB, .18, tk); Sound.click();
+    await grip(GRIP_TAB, .18, tk);
     hold(newEl, start.dx, start.dy, start.r);
     await moveL(pS, pB, aS.pitch, aB.pitch, ROLL, .75, tk);
     await sleepS(.05, tk);
-    await grip(1, .14, tk); Sound.click();
+    await grip(1, .14, tk);
     release(newEl);
     newEl.classList.remove("in-transit");
     showPanel(to, true);
@@ -363,13 +363,11 @@ function buildRobot(THREE, App){
     dist[0] = clamp(trackA, -40, 40) * .55;
     dist[3] = clamp(trackA, -40, 40) * .4;
 
-    let speed = Math.abs(trackV)*.06;
     const hstep = dt/2;
     for (let n=0;n<2;n++) for (let i=0;i<5;i++){
       const a = K*(cmd[i]-q[i]) - D*v[i] + dist[i];
       v[i] += a*hstep; q[i] += v[i]*hstep;
     }
-    for (let i=0;i<5;i++) speed += Math.abs(v[i]);
     g += (gCmd - g) * Math.min(1, dt*14);
 
     const jit = i => motionOn && !held ? Math.sin(time*(1.7+i*.37) + i*2.1)*.004 : 0;
@@ -387,7 +385,6 @@ function buildRobot(THREE, App){
     renderer.render(scene, camera);
     updateHeld();
     updateLaser();
-    Sound.update(speed);
 
     if ((frame++ & 3) === 0){
       for (let i=0;i<5;i++) els[i].textContent = (q[i]*180/PI).toFixed(1) + "°";

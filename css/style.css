@@ -91,11 +91,14 @@ button{font:inherit;color:inherit}
 .grab-tab::before{content:"";position:absolute;top:14px;bottom:14px;left:6px;right:5px;background:repeating-linear-gradient(0deg,#9a83c6 0 2px,transparent 2px 6px);opacity:.75}
 .held .grab-tab,.in-transit .grab-tab{box-shadow:0 0 14px rgba(185,138,255,.7)}
 .no-3d .grab-tab{display:none}
-.station-home .scroll{display:flex;flex-direction:column;justify-content:center}
+.station-home .scroll{display:flex;flex-direction:column;container-type:inline-size}
+/* auto margins center the hero but let it scroll instead of clipping when it's taller than the panel */
+.station-home .scroll > :first-child{margin-top:auto}
+.station-home .scroll > :last-child{margin-bottom:auto}
 
 h1,h2,h3{margin:0;font-weight:700}
 h2:focus,h1:focus{outline:none}
-.hero-name{font-size:clamp(52px,6.6vw,118px);font-stretch:125%;font-weight:850;line-height:.88;letter-spacing:-.035em;margin-bottom:18px}
+.hero-name{font-size:clamp(40px,5.4vw,100px);font-size:clamp(36px,14cqi,118px);font-stretch:125%;font-weight:850;line-height:.88;letter-spacing:-.035em;margin-bottom:18px}
 .hero-role{font-size:clamp(20px,1.9vw,26px);font-stretch:112%;font-weight:500;margin:0 0 20px}
 .hero-copy{font-size:18px;color:var(--muted);margin:0 0 32px;max-width:34em}
 .cta{display:inline-flex;align-items:center;gap:14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:4px;padding:16px 22px;font-weight:700;font-size:17px;cursor:pointer;font-stretch:105%;align-self:flex-start}
@@ -129,6 +132,7 @@ h2{font-size:clamp(36px,3.6vw,50px);font-stretch:120%;font-weight:780;line-heigh
 .spec{display:grid;gap:14px;margin:16px 0}
 .spec dt{color:var(--muted);font-size:14px;margin-bottom:4px}
 .spec dd{margin:0}
+.spec .hl dt{color:var(--accent-hi)}
 .tags{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
 .tags li{font-size:13.5px;padding:3px 9px;border:1px solid var(--steel);border-radius:3px;background:var(--floor)}
 .media{margin:4px 0 16px}
@@ -152,14 +156,13 @@ h2{font-size:clamp(36px,3.6vw,50px);font-stretch:120%;font-weight:780;line-heigh
 .tl-body p{margin:0}
 
 .bins{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.bin{all:unset;box-sizing:border-box;cursor:pointer;display:block;border:1px solid var(--line);background:var(--panel-solid);border-radius:4px;padding:16px 16px 12px;transition:border-color .2s}
+.bin{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;border:1px solid var(--line);background:var(--panel-solid);border-radius:4px;padding:16px;transition:border-color .2s}
 .bin:hover{border-color:var(--steel)}
 .bin:focus-visible{outline:2px solid var(--glow)}
 .bin[aria-pressed="true"]{border-color:var(--accent)}
-.bin-name{display:block;font-weight:700;font-stretch:108%;font-size:17px;margin-bottom:8px}
-.ic{display:inline-block;position:relative;margin:9px 5px 9px 0;padding:5px 11px;font-size:13.5px;background:#0a080e;border:1px solid var(--steel);border-radius:2px}
-.ic::before,.ic::after{content:"";position:absolute;left:5px;right:5px;height:4px;background:repeating-linear-gradient(90deg,#8a809c 0 3px,transparent 3px 7px)}
-.ic::before{top:-5px}.ic::after{bottom:-5px}
+.bin-name{display:block;font-weight:700;font-stretch:108%;font-size:17px;margin-bottom:12px}
+.ics{display:flex;flex-wrap:wrap;gap:8px}
+.ic{padding:5px 11px;font-size:13.5px;background:#0a080e;border:1px solid var(--steel);border-radius:3px}
 .bin[aria-pressed="true"] .ic{border-color:#6a4fa0}
 
 .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:8px}

@@ -9,7 +9,7 @@ index.html        page layout and section markup
 css/style.css     all styles
 js/content.js     projects, experience, skills, and contact info
 js/robot.js       the arm: inverse kinematics, joint servo model, grab sequences
-js/main.js        rendering, navigation, sound, lazy-loading Three.js
+js/main.js        rendering, navigation, lazy-loading Three.js
 about.html ...    short URLs (/about, /projects, ...) that open the site at that section
 images/           project photos and GIFs
 resume.pdf

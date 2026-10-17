@@ -1,4 +1,4 @@
-/* main.js: page rendering, navigation, sound, and loading the 3D robot.
+/* main.js: page rendering, navigation, and loading the 3D robot.
    Content lives in content.js; the arm lives in robot.js. */
 (() => {
 const STATIONS = [
@@ -25,9 +25,9 @@ $("#projectList").innerHTML = PROJECTS.map((p,i)=>`
     ${p.media ? `<figure class="media">${p.media.type==="video"
       ? `<video src="${esc(p.media.src)}" controls preload="none" playsinline></video>`
       : `<img src="${esc(p.media.src)}" alt="${esc(p.media.alt||"")}" loading="lazy">`}</figure>` : ""}
-    <p>${esc(p.description)}</p>
     <dl class="spec">
-      <div><dt>My role</dt><dd>${esc(p.role)}</dd></div>
+      ${[["About",p.about],["My role",p.role],["Highlight",p.highlight]].filter(([,v])=>v)
+        .map(([k,v])=>`<div${k==="Highlight"?' class="hl"':""}><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}
       <div><dt>Built with</dt><dd><ul class="tags">${p.tech.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></dd></div>
     </dl>
     ${p.links && p.links.length ? `<p class="links">${p.links.map(l=>`<a href="${esc(l.href)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</p>` : ""}
@@ -42,7 +42,7 @@ $("#timeline").innerHTML = EXPERIENCE.map((e,i)=>`
   <div class="tl-body" id="tb-${i}" hidden><p>${esc(e.body)}</p></div>
 </li>`).join("");
 
-$("#bins").innerHTML = SKILLS.map(b=>`<button type="button" class="bin" aria-pressed="false"><span class="bin-name">${esc(b.name)}</span>${b.items.map(s=>`<span class="ic">${esc(s)}</span>`).join("")}</button>`).join("");
+$("#bins").innerHTML = SKILLS.map(b=>`<button type="button" class="bin" aria-pressed="false"><span class="bin-name">${esc(b.name)}</span><span class="ics">${b.items.map(s=>`<span class="ic">${esc(s)}</span>`).join("")}</span></button>`).join("");
 
 const contactItems = [
   ["Email", PROFILE.email, "mailto:"+PROFILE.email],
@@ -182,45 +182,6 @@ function collapseAll(){
   if (robot) robot.clearPoint();
 }
 
-/* ============ Sound (off by default) ============ */
-const Sound = {
-  on:false, ctx:null,
-  start(){
-    const C = window.AudioContext || window.webkitAudioContext; if (!C) return false;
-    if (!this.ctx){
-      this.ctx = new C();
-      const o = this.ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = 60;
-      const f = this.ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 380; f.Q.value = 3;
-      const g = this.ctx.createGain(); g.gain.value = 0;
-      o.connect(f); f.connect(g); g.connect(this.ctx.destination); o.start();
-      this.o = o; this.g = g;
-    }
-    this.ctx.resume(); this.on = true; return true;
-  },
-  stop(){ this.on = false; if (this.g) this.g.gain.setTargetAtTime(0, this.ctx.currentTime, .05); },
-  update(speed){
-    if (!this.on || !this.ctx) return;
-    const t = this.ctx.currentTime, s = Math.min(speed, 6);
-    this.g.gain.setTargetAtTime(s > .08 ? Math.min(s*.011, .04) : 0, t, .08);
-    this.o.frequency.setTargetAtTime(52 + s*34, t, .1);
-  },
-  click(){
-    if (!this.on || !this.ctx) return;
-    const n = this.ctx.createBufferSource(), len = this.ctx.sampleRate * .05;
-    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
-    for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 4);
-    const bp = this.ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value = 1900; bp.Q.value = 2;
-    const g = this.ctx.createGain(); g.gain.value = .25;
-    n.buffer = buf; n.connect(bp); bp.connect(g); g.connect(this.ctx.destination); n.start();
-  }
-};
-$("#soundToggle").addEventListener("click", e => {
-  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
-  if (on && !Sound.start()) return;
-  if (!on) Sound.stop();
-  e.currentTarget.setAttribute("aria-pressed", String(on));
-});
-
 /* ============ Initial state ============ */
 setNav(current);
 showPanel(current, false);
@@ -232,7 +193,7 @@ window.addEventListener("resize", () => { measureRail(); placeCarriage(robot ? r
 /* Interface the robot module uses to read and drive the page */
 const App = {
   get current(){ return current; }, get busy(){ return busy; }, get travelOn(){ return travelOn; },
-  sections, STATIONS, $, setStatus, showPanel, hidePanel, resetPlate, placeCarriage, Sound
+  sections, STATIONS, $, setStatus, showPanel, hidePanel, resetPlate, placeCarriage
 };
 
 /* ============ 3D robot (lazy loaded, optional) ============ */
