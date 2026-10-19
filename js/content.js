@@ -24,6 +24,13 @@ const PROJECTS = [
     media:{type:"video", src:"images/irrigation_system.mp4"},
     links:[]
   },
+  { name:"Natural-language pick and place", cat:"robotics",
+    summary:"Tell a robot arm where the cube goes, and it goes there",
+    about:"A robot arm with a wrist camera and suction gripper that finds a cube with computer vision, plans a collision-free path, and places it on a ring, in a box, or sideways into a wall shelf, all from spoken or typed commands.",
+    role:"Built the computer vision on a three-person NYU ARC team at Viam's Code That Moves Hackathon: cube detection from color and depth, camera-to-arm calibration, and the camera sweep that finds the cube when it's out of view.",
+    highlight:"Every route worked on the real workcell from plain-English commands, and the camera-sweep calibration predicted the cube's position to within 1 mm.",
+    tech:["Viam","Python","xArm6","RealSense D435","Computer vision","Motion planning","Speech recognition"],
+    links:[{label:"Code (team repo)", href:"https://github.com/Wafleem/viam-natural-lang-pick-place"}] },
   { name:"Emotionally intelligent robot tutor", cat:"robotics",
     summary:"Adaptive human-robot interaction for autistic children",
     about:"A ROS-based tutoring robot that combines speech, vision, and gesture recognition with SLAM so it can move around a room and adapt how it teaches to a child's emotional state.",
